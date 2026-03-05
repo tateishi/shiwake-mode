@@ -138,17 +138,17 @@
       (forward-char distance-in-xact))))
 
 (defun shiwake-mode-replace-first-date-in-current-line (new-date)
-  "カーソルのある行に含まれる最初の YYYY/MM/DD を NEW-DATE に置換.
-NEW-DATE は YYYY/MM/DD 形式の文字列.日付がなければ何もしない."
+  "カーソルのある行に含まれる最初の YYYY-MM-DD を NEW-DATE に置換.
+NEW-DATE は YYYY[/-]MM[/-]DD 形式の文字列.日付がなければ何もしない."
   (interactive
    (list
-    (format-time-string "%Y/%m/%d"
+    (format-time-string "%Y-%m-%d"
                         (org-read-date nil t nil "日付を選択:"))))
   (save-excursion
     (let ((line-start (line-beginning-position))
           (line-end (line-end-position)))
       (goto-char line-start)
-      (when (re-search-forward "\\([0-9]\\{4\\}/[0-9]\\{2\\}/[0-9]\\{2\\}\\)" line-end t)
+      (when (re-search-forward "\\([0-9]\\{4\\}[/-][0-9]\\{2\\}[/-][0-9]\\{2\\}\\)" line-end t)
         (replace-match new-date nil nil nil 1)))))
 
 (defface shiwake-mode-font-tag-face
