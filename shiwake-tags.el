@@ -48,8 +48,11 @@ Looks in `ledger-tagnames-file' if set, otherwise the current buffer."
 
 (defun shiwake-report-tagname-format-specifier ()
   "Return a valid meta-data tag name (shiwake version)."
-  (message "shiwake-report-tagname-format-specifier.")
   (shiwake-read-tag-with-prompt "TAG"))
+
+(defun shiwake-report-month-format-specifier ()
+  "Return this month."
+  (format-time-string "%Y-%m"))
 
 (provide 'shiwake-tags)
 ;;; shiwake-tags.el ends here
