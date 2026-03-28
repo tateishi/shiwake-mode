@@ -103,7 +103,6 @@ COMMODITY: 通貨"
 ;;      (message "tmepl: %s" template)
       (format template end-date payee interest national-tax local-tax account commodity))))
 
-
 (defun shiwake-insert-interest-transaction (principal commodity rate start-date end-date payee account)
   "利息受け取りの時の取引を記録.
 PRINCIPAL: 元金
@@ -113,17 +112,17 @@ START-DATE: 預入日
 END-DATE: 満期日
 PAYEE: 相手先
 ACCOUNT: 科目"
-  (interactive (list
-                (read-number "元金: ")
-                (completing-read "通貨: " shiwake--commodities)
-                (read-number "利率(%): ")
-                (replace-regexp-in-string "-" "/" (org-read-date nil nil nil "預入日: "))
-                (replace-regexp-in-string "-" "/" (org-read-date nil nil nil "満期日: "))
-                (ledger-read-payee-with-prompt "相手先: ")
-                (ledger-read-account-with-prompt "科目: ")))
-;;  (message "%d %s %.4f %s %s %s %s" principal commodity rate start-date end-date payee account)
+  (interactive
+   (let* ((p (read-number "元金: "))
+          (c (completing-read (format "元金: %S 通貨: " p) shiwake--commodities))
+          (r (read-number (format "元金: %S 通貨: %S 利率(%%): " p c)))
+          (s (replace-regexp-in-string "-" "/" (org-read-date nil nil nil (format "元金: %S 通貨: %S 利率(%%): %S 預入日: " p c r))))
+          (e (replace-regexp-in-string "-" "/" (org-read-date nil nil nil (format "元金: %S 通貨: %S 利率(%%): %S 預入日: %S 満期日: " p c r s))))
+          (payee (ledger-read-payee-with-prompt (format "元金: %S 通貨: %S 利率(%%): %S 預入日: %S 満期日: %S 相手先: " p c r s e)))
+          (a (ledger-read-account-with-prompt (format "元金: %S 通貨: %S 利率(%%): %S 預入日: %S 満期日: %S 相手先: %S 科目: " p c r s e payee))))
+     (list p c r s e payee a)))
   (insert (shiwake--interest-tx principal rate start-date end-date payee account commodity))
-  )
+  (ledger-post-align-xact (point)))
 
 (provide 'shiwake-insert-interest)
 ;;; shiwake-insert-interest.el ends here
