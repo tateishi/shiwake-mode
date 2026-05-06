@@ -98,23 +98,23 @@
     (when ledger-post-auto-align
       (ledger-post-align-postings (point-min) (point-max)))))
 
-(defun shiwake-insert-payee (new)
-  "Insert payee NEW."
-  (interactive
-   (let* ((new-name (ledger-read-payee-with-prompt "New Payee")))
-     (list new-name)))
+(defun shiwake-insert-payee (new-payee)
+  "カーソルのあるトランザクションのPayeeをNEW-PAYEEに置換する."
+  (interactive (list (ledger-read-payee-with-prompt "New Payee: ")))
   (save-excursion
-    (let ((cur-pos (point)))
-      (goto-char (pos-bol))
+    (let* ((region (ledger-navigate-find-xact-extents (point)))
+          (begin-region (car region))
+          (end-region (cadr region))
+          (cur-pos (point)))
+      (goto-char begin-region)
       (if (re-search-forward ledger-payee-name-or-directive-regex (line-end-position) t)
-          (replace-match new 'fixedcase 'literal nil 1)
+          (replace-match new-payee 'fixedcase 'literal nil 1)
         (goto-char cur-pos)
-        (insert new)
-        (indent-for-tab-command)
-        )
+        (insert new-payee)
+        (indent-for-tab-command))
       (when ledger-post-auto-align
-        (ledger-post-align-postings (point-min) (point-max))))
-    ))
+        (ledger-post-align-postings (point-min) (point-max))))))
+
 
 (defun shiwake-toggle-pending-current-transaction ()
   "Set the transaction at point using pending."
