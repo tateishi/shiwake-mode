@@ -3,10 +3,8 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'cl)
 (require 'org)
 (require 'ledger-mode)
-;;(require 'shiwake-mode)
 
 (defvar shiwake--national-tax-ratio 15.315 "国税税率.")
 (defvar shiwake--local-tax-ratio 5 "地方税税率.")

@@ -1,11 +1,14 @@
-;;; shiwake-mode.el --- My major mode for editing ledger files. -*- lexical-binding: t; -*-
+;;; shiwake-mode.el --- Major mode for editing shiwake files. -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021 TATEISHI Tadatoshi
 
 ;; Author: TATEISHI Tadatoshi <ishio39@gmail.com>
 ;; Maintainer: TATEISHI Tadatoshi <ishio39@gmail.com>
 ;; Created: 2021/04/09
-;; Version: 0.0.1
+;; Version: 0.1.0
+;; Package-Requires: ((emacs "28.1") (ledger-mode "3.2.1"))
+;; Keywords: convenience, files, tools
+;; URL: https://github.com/tateishi/shiwake-mode
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -93,8 +96,7 @@
     (if (re-search-forward ledger-account-name-or-directive-regex (line-end-position) t)
         (replace-match new 'fixedcase 'literal nil 1)
       (insert new)
-      (indent-for-tab-command)
-      )
+      (indent-for-tab-command))
     (when ledger-post-auto-align
       (ledger-post-align-postings (point-min) (point-max)))))
 
@@ -103,9 +105,9 @@
   (interactive (list (ledger-read-payee-with-prompt "New Payee: ")))
   (save-excursion
     (let* ((region (ledger-navigate-find-xact-extents (point)))
-          (begin-region (car region))
-          (end-region (cadr region))
-          (cur-pos (point)))
+           (begin-region (car region))
+           ;; (end-region (cadr region))
+           (cur-pos (point)))
       (goto-char begin-region)
       (if (re-search-forward ledger-payee-name-or-directive-regex (line-end-position) t)
           (replace-match new-payee 'fixedcase 'literal nil 1)
@@ -114,7 +116,6 @@
         (indent-for-tab-command))
       (when ledger-post-auto-align
         (ledger-post-align-postings (point-min) (point-max))))))
-
 
 (defun shiwake-toggle-pending-current-transaction ()
   "Set the transaction at point using pending."
