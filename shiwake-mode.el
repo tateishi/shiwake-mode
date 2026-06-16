@@ -36,23 +36,7 @@
 (require 'ledger-mode)
 (require 'shiwake-insert-interest)
 (require 'shiwake-tags)
-
-(defconst shiwake-date-template
-  "
-# =================== %Y/%m/%d ===================\n")
-
-(defconst shiwake-account-template
-  "
-#                     %s
-# --------------------------------------------------\n\n")
-
-(defun shiwake-date ()
-  (interactive)
-  (insert (format-time-string shiwake-date-template)))
-
-(defun shiwake-account (account)
-  (interactive "MAccount: ")
-  (insert (format shiwake-account-template account)))
+(require 'shiwake-misc)
 
 (defun shiwake-skip-account-backward ()
   (save-excursion
