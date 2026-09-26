@@ -37,6 +37,7 @@
 (require 'shiwake-insert-interest)
 (require 'shiwake-tags)
 (require 'shiwake-misc)
+(require 'shiwake-report)
 
 (defun shiwake-skip-account-backward ()
   (save-excursion

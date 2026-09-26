@@ -43,24 +43,19 @@ FORMAT is yyyy-mm."
       (format "%04d-%02d" year month-index))))
 
 ;;; レポートの表示幅を調整する
-(defun shiwake-report-compute-extra-args-acount (orig-fun report-cmd)
+(defun shiwake-report-compute-extra-args-around (orig-fun report-cmd)
   "レポートの表示幅を調整する.
 
 ORIG-FUN に引数 REPORT-CMD としてを呼び出し、結果を加工して
 レポートの表示幅を調整する."
-  (message "advice arg: %S" report-cmd)
   (let ((args (funcall orig-fun report-cmd)))
-    (message "advice orig-fun called: args: %S" args)
-
     (if-let* ((pos (cl-position "--columns" args :test #'string=))
               (width (nth (1+ pos) args)))
         (progn
           (setf (nth (1+ pos) args)
                 (number-to-string
                  (truncate (* 0.8 (string-to-number width)))))
-          (message "advice after edit: args: %S" args)
-          args
-          )
+          args)
       args)))
 
 (defun shiwake-report-around (orig-fun &rest args)
