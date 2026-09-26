@@ -43,7 +43,7 @@ FORMAT is yyyy-mm."
       (format "%04d-%02d" year month-index))))
 
 ;;; レポートの表示幅を調整する
-(defun shiwake-report-compute-extra-args-advice (orig-fun report-cmd)
+(defun shiwake-report-compute-extra-args-acount (orig-fun report-cmd)
   "レポートの表示幅を調整する.
 
 ORIG-FUN に引数 REPORT-CMD としてを呼び出し、結果を加工して
@@ -52,8 +52,8 @@ ORIG-FUN に引数 REPORT-CMD としてを呼び出し、結果を加工して
   (let ((args (funcall orig-fun report-cmd)))
     (message "advice orig-fun called: args: %S" args)
 
-    (if-let ((pos (cl-position "--columns" args :test #'string=))
-             (width (nth (1+ pos) args)))
+    (if-let* ((pos (cl-position "--columns" args :test #'string=))
+              (width (nth (1+ pos) args)))
         (progn
           (setf (nth (1+ pos) args)
                 (number-to-string
@@ -63,10 +63,23 @@ ORIG-FUN に引数 REPORT-CMD としてを呼び出し、結果を加工して
           )
       args)))
 
-;;; レポート表示幅調整用adviceをつける
-(advice-add 'ledger-report--compute-extra-args
+(defun shiwake-report-around (orig-fun &rest args)
+  (advice-add 'ledger-report--compute-extra-args
+              :around
+              #'shiwake-report-compute-extra-args-around)
+  (prog1
+      (apply orig-fun args)
+    (advice-remove 'ledger-report--compute-extra-args
+                   #'shiwake-report-compute-extra-args-around)))
+
+(advice-add 'ledger-report
             :around
-            #'shiwake-report-compute-extra-args-advice)
+            #'shiwake-report-around)
+
+;;; レポート表示幅調整用adviceをつける
+;; (advice-add 'ledger-report--compute-extra-args
+;;             :around
+;;             #'shiwake-report-compute-extra-args-advice)
 
 ;;; レポート表示幅調整用adviceを外す
 ;; (advice-remove 'ledger-report--compute-extra-args
