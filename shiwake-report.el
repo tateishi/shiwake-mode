@@ -30,6 +30,7 @@
 
 ;;; Code:
 
+(require 'org)
 (require 'ledger-report)
 
 (defun shiwake-report-month-format-specifier ()
@@ -67,6 +68,33 @@ nilなら補正しない。"
 (advice-add 'ledger-report--compute-extra-args
             :filter-return
             #'shiwake-adjust-columns)
+
+;;; 指定日付の行へ移動、なければ直前の行へ
+(defun shiwake-report-goto-nearest-date (date)
+  "DATEの行へ移動、なければ直前の行へ移動する."
+  (when (derived-mode-p 'ledger-report-mode)
+    (goto-char (point-min))
+    (let (found)
+      (while (and (not found)
+                  (re-search-forward "^\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)" nil t))
+        (when (string-greaterp (match-string 1) date)
+          (setq found t)
+          (beginning-of-line)
+          (unless (bobp)
+            (forward-line -1))))
+      (when found
+        (recenter)))))
+
+(defun shiwake-report-goto-nearest-today ()
+  "今日の行へ移動、なければ直前の行へ移動する."
+  (interactive)
+  (shiwake-report-goto-nearest-date (format-time-string "%Y-%m-%d")))
+
+(defun shiwake-report-goto-date ()
+  "指定日付の行へ移動、なければ直前の行へ移動する."
+  (interactive)
+  (let ((date (org-read-date nil nil nil "日付: ")))
+    (shiwake-report-goto-nearest-date date)))
 
 (provide 'shiwake-report)
 
