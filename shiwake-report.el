@@ -42,6 +42,40 @@ FORMAT is yyyy-mm."
            (month-index (cdr month)))
       (format "%04d-%02d" year month-index))))
 
+;;; レポートの表示幅を調整する
+(defun shiwake-report-compute-extra-args-advice (orig-fun report-cmd)
+  "レポートの表示幅を調整する.
+
+ORIG-FUN に引数 REPORT-CMD としてを呼び出し、結果を加工して
+レポートの表示幅を調整する."
+  (message "advice arg: %S" report-cmd)
+  (let ((args (funcall orig-fun report-cmd)))
+    (message "advice orig-fun called: args: %S" args)
+
+    (if-let ((pos (cl-position "--columns" args :test #'string=))
+             (width (nth (1+ pos) args)))
+        (progn
+          (setf (nth (1+ pos) args)
+                (number-to-string
+                 (truncate (* 0.8 (string-to-number width)))))
+          (message "advice after edit: args: %S" args)
+          args
+          )
+      args)))
+
+;;; レポート表示幅調整用adviceをつける
+(advice-add 'ledger-report--compute-extra-args
+            :around
+            #'shiwake-report-compute-extra-args-advice)
+
+;;; レポート表示幅調整用adviceを外す
+;; (advice-remove 'ledger-report--compute-extra-args
+;;                #'shiwake-report-compute-extra-args-advice)
+
+;;; advice が設定されているか判定
+;; (advice-member-p #'shiwake-report-compute-extra-args-advice
+;;                  'ledger-report--compute-extra-args)
+
 (provide 'shiwake-report)
 
 ;;; shiwake-report.el ends here
